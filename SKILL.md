@@ -1,18 +1,9 @@
 ---
 name: rss-plugin-installer
-description: RSS MCP 插件安装与基础使用 - 安装独立的 RSS MCP 服务器，订阅/浏览/管理 RSS 订阅源
-tags:
-  - rss
-  - install
-  - setup
-  - subscription
-  - feed-management
-  - compliance
-  - catalog
-  - capabilities
-roles:
-  - assistant_agent
+description: RSS MCP 插件安装与基础使用；兼容 GitHub 上游 skill 名称，实际能力由 feed-all MCP 服务提供
 metadata:
+  canonical_skill: feed-all
+  mcp_server: feed_all
   copaw:
     requires:
       tools:
@@ -21,7 +12,10 @@ metadata:
         - bash
 ---
 
-# RSS MCP Plugin Installer - RSS 插件安装与基础使用
+# RSS MCP Plugin Installer - 兼容入口
+
+本 skill 保留原有 `rss-plugin-installer` 名称，以兼容已有客户端配置。
+规范能力名称为 `feed-all`，实际工具以 MCP `tools/list` 为准。
 
 ## 何时使用
 
@@ -48,7 +42,7 @@ metadata:
 
 ### 步骤 1：配置到 MCP 客户端
 
-在 `~/.claude/settings.json` 中添加一行配置：
+如果目标版本已经发布到 PyPI，在 `~/.claude/settings.json` 中添加：
 
 ```json
 {
@@ -61,7 +55,28 @@ metadata:
 }
 ```
 
-首次启动时 `uvx` 会自动从 PyPI 下载并缓存 `feed-all`，后续启动秒开。
+如果使用本地 checkout，改为：
+
+```json
+{
+  "mcpServers": {
+    "feed-all": {
+      "command": "uv",
+      "args": ["run", "--directory", "/ABSOLUTE/PATH/rss-plugin", "feed-all"]
+    }
+  }
+}
+```
+
+Codex 使用等价的 TOML 配置：
+
+```toml
+[mcp_servers.feed_all]
+command = "uvx"
+args = ["feed-all"]
+```
+
+本地开发时将 `uvx` 配置替换为上面的 `uv run --directory` 配置。
 
 ### 步骤 2：验证连通性
 

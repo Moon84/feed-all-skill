@@ -5,6 +5,10 @@
 
 用于安装和配置 [feed-all](https://pypi.org/project/feed-all/) MCP 插件的 Skill 文档。
 
+当前 skill 对应 `feed-all 0.2.x`。PyPI 版本与本仓库 skill 的发布状态应以
+PyPI 页面为准；如果目标版本尚未发布，请使用本地 checkout 的 `uv run`
+配置，不要假设 `uvx feed-all` 已经提供最新工具。
+
 **feed-all** 是一个全功能的 RSS/Feed MCP 插件，支持：
 - RSS/Atom 订阅、刷新、浏览
 - 网页追踪（快照、列表提取、站点解析器）
@@ -17,8 +21,16 @@
 
 ### 1. 安装 MCP 插件
 
+已发布版本：
+
 ```bash
 uvx feed-all
+```
+
+本地 checkout：
+
+```bash
+uv run --directory /ABSOLUTE/PATH/rss-plugin feed-all
 ```
 
 ### 2. 配置 Claude Code
@@ -64,7 +76,7 @@ feed-all-skill/
 ├── LICENSE                           # MIT 许可证
 ├── references/
 │   ├── capabilities.json             # 344+ 预配置订阅源目录
-│   ├── tools.md                      # 13 个工具的完整签名
+│   ├── tools.md                      # 14 个工具的完整签名
 │   ├── health-tracking.md            # 健康追踪说明
 │   ├── installation-check.md         # 安装检查清单
 │   └── troubleshooting.md            # 故障排查
@@ -81,6 +93,9 @@ feed-all-skill/
 - **Codex / OpenClaw** — 配置 MCP 服务器后，Agent 可读取 `SKILL.md` 学习使用方法
 
 ## 维护
+
+MCP `tools/list` 是运行时能力的权威来源；`references/tools.md` 是便于
+Agent 发现和人工审阅的同步快照。新增或修改工具时必须同时更新二者。
 
 ### 更新 capabilities.json
 
