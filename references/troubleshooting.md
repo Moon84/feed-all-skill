@@ -13,7 +13,7 @@ Error: MCP server not responding
 ```
 Error: command not found: feed-all
 ```
-**解决**: `uvx feed-all` 是推荐用法。如果要用 `feed-all` 命令，先 `pip install feed-all`。
+**解决**: 使用 `uvx feed-all`。本项目统一使用 `uv`，不要使用 `pip` 或 `pip3`。
 
 ## 订阅失败
 
@@ -28,7 +28,7 @@ Error: command not found: feed-all
 
 | 现象 | 含义 | 处理 |
 |------|------|------|
-| `auto_disabled: true` | 连续 10 次失败，自动禁用 | `rss_update_feed(feed_id, refresh_enabled=True)` |
+| `auto_disabled: true` | 当前实现连续 10 次失败后自动禁用 | `rss_update_feed(feed_id, refresh_enabled=True)` |
 | 刷新不返回新条目 | 源没有新内容 | 正常，等下次刷新 |
 | 网页快照不更新 | 内容没有变化 | 正常，内容哈希未变 |
 

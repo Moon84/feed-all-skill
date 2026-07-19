@@ -1,41 +1,60 @@
-# Feed All - RSS/Feed MCP Skill
+# feed-all
 
 [![PyPI](https://img.shields.io/pypi/v/feed-all)](https://pypi.org/project/feed-all/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-用于安装和配置 [feed-all](https://pypi.org/project/feed-all/) MCP 插件的 Skill 文档。
+`feed-all` is a local-first RSS, Atom, webpage tracking, and MCP service for
+long-term information follow-up in Codex, Claude, and other MCP hosts.
 
-当前 skill 对应 `feed-all 0.2.x`。PyPI 版本与本仓库 skill 的发布状态应以
-PyPI 页面为准；如果目标版本尚未发布，请使用本地 checkout 的 `uv run`
-配置，不要假设 `uvx feed-all` 已经提供最新工具。
+It keeps subscription metadata and links available to an Agent. The Agent
+decides when to refresh, what is relevant, whether to read selected content,
+and whether a user should be reminded.
 
-**feed-all** 是一个全功能的 RSS/Feed MCP 插件，支持：
-- RSS/Atom 订阅、刷新、浏览
-- 网页追踪（快照、列表提取、站点解析器）
-- 健康追踪 + 自动禁用（10 次失败后自动停止）
-- 持久化 SQLite 存储
-- OPML 导入/导出
-- 344+ 预配置订阅源目录
+## What It Solves
 
-## 快速开始
+- Maintain durable RSS and Atom subscriptions across supported hosts.
+- Track selected webpages when a source has no usable feed.
+- Keep source health, reading state, and OPML portability.
+- Return compact structured results suitable for Agent workflows.
+- Support on-demand article retrieval without turning the service into a
+  general-purpose archive.
 
-### 1. 安装 MCP 插件
+## What It Does
 
-已发布版本：
+- RSS and Atom subscription and refresh.
+- Webpage subscription snapshots.
+- Feed discovery from a webpage.
+- Local SQLite metadata storage.
+- Entry search, reading state, and source health checks.
+- OPML import and export.
+- MCP integration through stdio.
+
+## What It Does Not Do
+
+- It does not run a background scheduler.
+- It does not provide a built-in periodic digest.
+- It does not bypass CAPTCHA, login, paywalls, or anti-bot challenges.
+- It does not automatically subscribe external search results.
+- It does not change a user's profile without confirmation.
+- The 0.2.x service may cache fetched article content; the planned retention
+  policy makes link and metadata storage the default. See
+  [Data Lifecycle](docs/data-lifecycle.md).
+
+## Quick Start
+
+Install the published MCP server:
 
 ```bash
 uvx feed-all
 ```
 
-本地 checkout：
+For a local checkout:
 
 ```bash
 uv run --directory /ABSOLUTE/PATH/rss-plugin feed-all
 ```
 
-### 2. 配置 Claude Code
-
-在 `~/.claude/settings.json` 中添加：
+Claude Code, Claude Desktop, Cline, and compatible JSON MCP hosts:
 
 ```json
 {
@@ -48,63 +67,66 @@ uv run --directory /ABSOLUTE/PATH/rss-plugin feed-all
 }
 ```
 
-### 3. 使用
+Codex:
 
-```python
-# 订阅一个源
-rss_subscribe(url="https://hnrss.org/frontpage", name="Hacker News", category="tech")
-
-# 查看订阅
-rss_list_feeds()
-
-# 浏览文章
-rss_list_entries(limit=20)
-
-# 获取全文
-rss_get_entry(entry_id="abc123")
-
-# 检查健康
-rss_check_health(revalidate=True)
+```toml
+[mcp_servers.feed_all]
+command = "uvx"
+args = ["feed-all"]
 ```
 
-## 文档结构
-
-```
-feed-all-skill/
-├── SKILL.md                          # 主技能文档（安装 + 使用场景 + 合规）
-├── README.md                         # 本文件
-├── LICENSE                           # MIT 许可证
-├── references/
-│   ├── capabilities.json             # 344+ 预配置订阅源目录
-│   ├── tools.md                      # 14 个工具的完整签名
-│   ├── health-tracking.md            # 健康追踪说明
-│   ├── installation-check.md         # 安装检查清单
-│   └── troubleshooting.md            # 故障排查
-└── templates/
-    └── subscription_report.md        # 订阅报告模板
-```
-
-## 与 Claude Code / Cline / Codex 配合
-
-本 Skill 适用于任何支持 MCP 协议和 Skill 文档的 AI 客户端：
-
-- **Claude Code** — 配置 `mcpServers` 后可用
-- **Cline** — 同上
-- **Codex / OpenClaw** — 配置 MCP 服务器后，Agent 可读取 `SKILL.md` 学习使用方法
-
-## 维护
-
-MCP `tools/list` 是运行时能力的权威来源；`references/tools.md` 是便于
-Agent 发现和人工审阅的同步快照。新增或修改工具时必须同时更新二者。
-
-### 更新 capabilities.json
+Keep the data directory explicit when multiple hosts share a machine:
 
 ```bash
-# 从 EntroFeed 项目同步
-cp path/to/entrofeed/src/services/feed/rss_capability/capabilities.json \
-   references/capabilities.json
+FEED_ALL_DATA_DIR="$HOME/.feed-all" uvx feed-all
 ```
+
+## Agent Workflow
+
+```text
+Discover -> Validate -> Subscribe -> Refresh -> Filter
+        -> Read selected entries -> Summarize or remind
+```
+
+The runtime `tools/list` response is authoritative. Use the workflow in
+[`SKILL.md`](SKILL.md) and the released tool contract in
+[`references/tools.md`](references/tools.md).
+
+## Storage and Privacy
+
+The default store is local SQLite under `~/.feed-all`. The current released
+service stores source and entry metadata and may persist fetched content when
+requested. The target design is link-first: bounded previews and metadata are
+kept locally, while full text is fetched only when the user or Agent asks for
+it. See [Data Lifecycle](docs/data-lifecycle.md) and
+[Compliant Fetching](docs/compliant-fetching.md).
+
+## Documentation
+
+- [中文说明](README.zh-CN.md)
+- [Agent skill](skill/SKILL.md)
+- [Host configuration](docs/host-configuration.md)
+- [Architecture](docs/architecture.md)
+- [Data lifecycle](docs/data-lifecycle.md)
+- [Compliant fetching](docs/compliant-fetching.md)
+- [External discovery](docs/discovery.md)
+- [Personalization](docs/personalization.md)
+- [Tool reference](references/tools.md)
+- [Response contract](references/response-contract.md)
+- [OpenSpec design index](openspec/project.md)
+
+## Version Policy
+
+Documentation distinguishes `Current 0.2.x`, `Planned 0.3.x`, `Experimental`,
+and `Out of scope`. Planned tools are never presented as available MCP tools.
+
+## Troubleshooting and Contribution
+
+See [Troubleshooting](docs/troubleshooting.md), then inspect the runtime
+`tools/list` result and `rss_check_health` output. Contributions should update
+the English and Chinese document with the same section structure and must not
+claim capabilities that are absent from the released server.
 
 ## License
 
-MIT
+MIT. See [LICENSE](LICENSE).

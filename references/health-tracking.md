@@ -2,7 +2,8 @@
 
 ## 存储结构
 
-数据存储在 `~/.rss-plugin/data.db`（SQLite）：
+数据默认存储在 `~/.feed-all/data.db`（SQLite），也可以通过
+`FEED_ALL_DATA_DIR` 修改：
 
 ```
 feeds
@@ -13,12 +14,12 @@ feeds
 
 entries
   ├── id, feed_id, title, url, published_at
-  ├── content, preview, authors
+  ├── content, preview, authors（0.2.x 可能包含按需缓存正文）
   ├── is_read, entry_type (rss / webpage_snapshot / webpage_list)
   └── FOREIGN KEY feed_id → feeds.id
 
 entry_content
-  └── id, entry_id, url, content, summary, unretrievable
+  └── id, entry_id, url, content（0.2.x 可能保存按需读取正文）
 ```
 
 ## 健康追踪字段
@@ -40,7 +41,7 @@ entry_content
 当 consecutive_failures >= 10:
     auto_disabled = true
     refresh_enabled = false
-    （该源不再参与自动刷新）
+    （该源不再参与被 Agent 调用的刷新）
 ```
 
 ## 重新启用

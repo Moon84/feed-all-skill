@@ -2,11 +2,11 @@
 
 ## 前置检查
 - [ ] `uv` 已安装: `which uv`
-- [ ] Python 3.11+: `python --version`
+- [ ] Python 3.11+: `uv run python --version`
 
 ## 安装步骤
 - [ ] 通过 `uvx` 安装: `uvx feed-all`（首次会自动下载，约 35 个依赖包）
-- [ ] 验证启动: 控制台输出 `RSS MCP server starting on stdio`
+- [ ] 验证启动: Host 能完成 MCP 初始化并看到 `tools/list`
 
 ## 配置
 - [ ] Claude Code 配置已添加（`~/.claude/settings.json`）：

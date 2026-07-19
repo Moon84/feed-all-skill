@@ -30,7 +30,7 @@
             "访问 https://www.cde.org.cn/main/news/listInfo/searchNews",
             "爬取新闻列表页",
             "提取标题、链接、日期",
-            "定时爬取更新"
+            "由用户配置的 Agent 任务按需刷新"
           ],
           "example": "CDE 最新药品审评 → 爬取 https://www.cde.org.cn/main/news/listInfo/searchNews"
         }
